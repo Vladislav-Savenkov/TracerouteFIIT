@@ -8,7 +8,7 @@ ipv4_pattern = r'^\d{1,3}(\.\d{1,3}){3}$'
 def parse_input():
     input = argparse.ArgumentParser()
     input.add_argument('ip', type=str, default='8.8.8.8')
-    input.add_argument('-t', type=int, default=1)
+    input.add_argument('-t', type=int, default=2)
     input.add_argument('-n', type=int, default=77)
     input.add_argument('-v', action='store_true')
     return input.parse_args()

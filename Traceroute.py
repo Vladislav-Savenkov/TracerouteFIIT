@@ -38,15 +38,12 @@ class Traceroute:
                 result += '*'
             else:
                 result += str(as_number).ljust(6)
-        else:
-            result += "*".ljust(6)
 
         return result
 
 
     @staticmethod
     def get_whois_server(ip_address):
-        """Определяет подходящий WHOIS сервер на основе первого октета IP адреса."""
         first_octet = int(ip_address.split('.')[0])
         if 0 <= first_octet <= 127:
             # ARIN
@@ -63,26 +60,14 @@ class Traceroute:
 
     @staticmethod
     def perform_whois_query(ip_address):
-        """
-        Выполняет WHOIS запрос и извлекает номер автономной системы.
-
-        Args:
-            ip_address (str): IP адрес для выполнения WHOIS запроса.
-
-        Returns:
-            str: Номер автономной системы или None, если информация не найдена.
-        """
         whois_server = Traceroute.get_whois_server(ip_address)
         port = 43
         try:
-            # Создаем TCP/IP сокет и подключаемся к WHOIS серверу
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
                 sock.connect((whois_server, port))
-                # Отправляем форматированный запрос
                 query = f'n + {ip_address}\r\n' if 'arin' in whois_server else f'-V Md5.5.7 {ip_address}\r\n'
                 sock.send(query.encode('utf-8'))
 
-                # Получаем и собираем ответ
                 response = b''
                 while True:
                     data = sock.recv(4096)
@@ -96,7 +81,6 @@ class Traceroute:
 
     @staticmethod
     def parse_asn(whois_data):
-        """Парсит данные WHOIS для извлечения номера автономной системы."""
         for line in whois_data.splitlines():
             if 'OriginAS' in line or 'origin:' in line:
                 return line.split(': ')[1].strip()[2:]
